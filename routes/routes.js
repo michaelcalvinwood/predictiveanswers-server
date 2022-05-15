@@ -16,4 +16,7 @@ router.route('/questions')
 router.route('/answer')
     .post(databaseInterface.setAnswer)
 
+router.route('/answers')
+    .post(databaseInterface.setAnswers);
+
 module.exports = router;

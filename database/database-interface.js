@@ -82,3 +82,28 @@ exports.setAnswer = ((req, res) => {
         return;
     })
 }) 
+
+const updateAnswers = (answers, curNum, res) => {
+    if (curNum > answers.length) {
+        return;
+    }
+
+    const { id, questionNumber, answer } = answers[curNum];
+
+    insertAnswer(id, questionNumber, answer)
+    .then(result => {
+        let test = curNum + 1;
+        if (test < answers.length) updateAnswers(answers, curNum + 1, res);
+        else {
+            res.status(200).send('answers updated');
+        };
+    })
+}
+
+exports.setAnswers = ((req, res) => {
+    
+    const answers = req.body;
+
+    updateAnswers(answers, 0, res)
+    
+})
