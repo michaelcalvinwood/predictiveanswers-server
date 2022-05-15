@@ -13,4 +13,7 @@ router.route('/user')
 router.route('/questions')
     .get(databaseInterface.getQuestions);
 
+router.route('/answer')
+    .post(databaseInterface.setAnswer)
+
 module.exports = router;

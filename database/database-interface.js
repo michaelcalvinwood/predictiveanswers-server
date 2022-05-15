@@ -42,3 +42,43 @@ exports.getQuestions = (req, res) => {
         return;
     })
 }
+
+const deleteAnswer = (id, questionNumber) => {
+    return knex('answers')
+    .del()
+    .where({
+        id: id,
+        question_number: questionNumber
+    })
+}
+
+const insertAnswer = (id, questionNumber, answer) => {
+    return deleteAnswer(id, questionNumber)
+    .then(data => {
+        return knex('answers')
+        .insert({
+            id: id,
+            question_number: questionNumber,
+            answer: answer
+        })
+    })
+}
+
+exports.setAnswer = ((req, res) => {
+    const {id, questionNumber, answer } = req.body;
+
+    if (!id || !questionNumber || !answer) {
+        res.status(400).send('invalid');
+        return;
+    }
+
+    insertAnswer(id, questionNumber, answer)
+    .then(result => {
+        res.status(200).send('answer updated');
+        return;
+    })
+    .catch(error => {
+        res.status(400).json(error);
+        return;
+    })
+}) 
