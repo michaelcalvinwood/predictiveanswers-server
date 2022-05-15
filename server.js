@@ -5,10 +5,13 @@ const cors = require('cors');
 const app = express();
 const https = require('https');
 const fs = require('fs');
+const routes = require('./routes/routes');
 
 app.use(express.static('public'));
 app.use(express.json({limit: '200mb'})); 
 app.use(cors());
+
+app.use('/', routes);
 
 const httpsServer = https.createServer({
  key: fs.readFileSync(`/etc/letsencrypt/live/${DOMAIN}/privkey.pem`),
