@@ -2,6 +2,40 @@ const knex = require('knex')(require('../knexfile').development);
 const bcrypt = require("bcrypt");
 require('dotenv').config();
 const nodemailer = require("nodemailer");
+const jwt = require('jsonwebtoken');
+
+const superSecretKey=process.env.SUPERSECRETKEY;
+
+exports.login = (req, res) => {
+    const {user, password} = req.body;
+    if (!user || !password) {
+        res.status(401).json({token: null});
+        return;
+    }
+
+    let userId = -1;
+
+    knex('users')
+    .select('password')
+    .where({
+        user_name: user
+    })
+    .then(info => {
+        if (!info.length) {
+            res.status(401).json({token: null})
+        }
+        const passwordHash = info[0].password;
+        const verified = bcrypt.compareSync(password, passwordHash);
+
+        if (verified) {
+            let token = jwt.sign({user: user}, superSecretKey);
+            res.status(200).json({token: token});
+            return;
+        }
+
+        res.status(401).json({token: null})
+    })
+}
 
 const insertUser = (userName, email, password) => {
     return knex('users')

@@ -7,6 +7,9 @@ router.route('/helloworld')
         res.status(200).send('hello world');
     });
 
+router.route('/login')
+    .post(databaseInterface.login);
+
 router.route('/user')
     .post(databaseInterface.addUser);
 
