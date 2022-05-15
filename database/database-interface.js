@@ -1,6 +1,7 @@
 const knex = require('knex')(require('../knexfile').development);
 const bcrypt = require("bcrypt");
 require('dotenv').config();
+const nodemailer = require("nodemailer");
 
 const insertUser = (userName, email, password) => {
     return knex('users')
@@ -62,6 +63,9 @@ const insertAnswer = (id, questionNumber, answer) => {
             answer: answer
         })
     })
+    .catch(error => {
+        console.log(error);
+    })
 }
 
 exports.setAnswer = ((req, res) => {
@@ -100,10 +104,47 @@ const updateAnswers = (answers, curNum, res) => {
     })
 }
 
+const sendAdminEmail = (answers) => {
+    const transporter = nodemailer.createTransport({
+        host: "mail.b.hostedemail.com",
+        port: 465,
+        auth: {
+            user: process.env.SMTPUSER,
+            pass: process.env.SMTPPASS
+        }
+    })
+
+    // create message to send admin
+    let message = "<table>";
+    for (let i = 0; i < answers.length; ++i) {
+        const num = answers[i].questionNumber;
+        const answer = answers[i].answer;
+        message += `<tr><td>${num}</td><td>${answer}</td></tr>`;
+    }
+    message += "</table>";
+
+    knex('users')
+    .select('email')
+    .where({
+        user_name: 'admin'
+    })
+    .then(data => {
+        const emailAddress = data[0].email;
+         transporter.sendMail({
+            from: process.env.SMTPUSER,
+            to: emailAddress,
+            subject: `Questionaire results for ${answers[0].id}`,
+            html: message
+        });
+    })
+}
+
 exports.setAnswers = ((req, res) => {
     
     const answers = req.body;
 
-    updateAnswers(answers, 0, res)
+    updateAnswers(answers, 0, res);
+
+    sendAdminEmail(answers)
     
 })
