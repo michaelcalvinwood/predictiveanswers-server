@@ -22,8 +22,14 @@ exports.login = (req, res) => {
     })
     .then(info => {
         if (!info.length) {
-            res.status(401).json({token: null})
+            res.status(401).json({token: null});
+            return;
         }
+        if (!info[0].password) {
+            res.status(401).json({token: null});
+            return;
+        }
+
         const passwordHash = info[0].password;
         const verified = bcrypt.compareSync(password, passwordHash);
 
@@ -59,6 +65,19 @@ exports.addUser = (req, res) => {
         res.status(200).send("OK");
     })
     .catch (error => {
+        res.status(400).json(error);
+        return;
+    })
+}
+
+exports.getResults = (req, res) => {
+    knex('answers')
+    .select('id', 'question_number', 'answer')
+    .then(data => {
+        res.status(200).json(data);
+        return;
+    })
+    .catch(error => {
         res.status(400).json(error);
         return;
     })

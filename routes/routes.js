@@ -22,4 +22,7 @@ router.route('/answer')
 router.route('/answers')
     .post(databaseInterface.setAnswers);
 
+router.route('/results')
+    .get(databaseInterface.getResults);
+
 module.exports = router;
