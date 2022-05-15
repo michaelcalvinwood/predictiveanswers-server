@@ -28,3 +28,17 @@ exports.addUser = (req, res) => {
         return;
     })
 }
+
+exports.getQuestions = (req, res) => {
+    knex('questions')
+    .select('num', 'question')
+    .orderBy('num', 'asc')
+    .then (data => {
+        res.status(200).json(data);
+        return;
+    })
+    .catch (error => {
+        res.status(400).json(error);
+        return;
+    })
+}
